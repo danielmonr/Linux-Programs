@@ -25,6 +25,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "helpers.h"
+#include "server.h"
 
 #define BUFF_SIZE 250
 
