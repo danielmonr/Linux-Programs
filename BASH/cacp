@@ -1,0 +1,10 @@
+if [ $# -ne 1 ]; then
+echo "Wrong number of parameters!"
+exit 1
+else
+make clean
+git add --a
+git commit -m "$1"
+git push
+echo "success"
+fi

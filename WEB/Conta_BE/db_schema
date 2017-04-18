@@ -1,0 +1,20 @@
+schema: 'contabilidad'
+tables:
+
+	users: 
+		- id
+		- username
+		- password
+		- type
+	
+	accounts:
+		- id
+		- name
+		- id_u
+
+	entry_lines:
+		- id
+		- concept
+		- value
+		- date
+		- id_a

@@ -1,0 +1,16 @@
+if [ $# -ne 2 ]; then
+echo "Wrong number of parameters! (FileName Key)"
+exit 1
+else
+python ~/Programas/Cypher/UnCypher.py <<123limit123
+$1
+$2
+True
+123limit123
+nano $1
+python ~/Programas/Cypher/Cypher.py <<123limit123
+$1
+$2
+True
+123limit123
+fi

@@ -1,0 +1,11 @@
+{user: {tipo: ''; id: ''; mail: ''; password: ''}};
+
+{admin: {name: ''; last: ''; adds: []}};
+
+{professor: {name: ''; last: ''; posts:[]; grades[{grade:''; comment:''}]}}; 
+
+{alumno: {name:'', last: ''; posts:[]}};
+
+{post: {}}}
+
+

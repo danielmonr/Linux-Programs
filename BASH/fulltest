@@ -1,0 +1,10 @@
+if [ $# -ne 1 ]; then
+echo "Wrong number of parameters!"
+exit 1
+else
+make clean
+make
+valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all $1
+echo "Test finished!"
+fi
+
