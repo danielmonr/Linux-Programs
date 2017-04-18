@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include "../lib/textHelper.h"
 
 struct node{
     int val;
@@ -76,6 +77,18 @@ void deleteAt(dlist_t *l, int i){
     del->prev = NULL;
     free(del);
     l->length = l->length-1;
+}
+
+int search(dlist_t *l, int v){
+  int cont = 0;
+  bool found = false;
+  node_t* aux = l->start;
+  while(!found && cont < l->length){
+    found = (aux->val == v)? true : false;
+    cont++;
+    aux = aux->next;
+  }
+  return (found)? cont-1 : -1;
 }
 
 void printDList(dlist_t *l){
