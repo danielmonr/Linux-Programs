@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +34,7 @@ node_t* lastNode(dlist_t* l){
     return n;
 }
 
-void addNode(dlist_t* l, int v){
+node_t* addNode(dlist_t* l, int v){
     node_t* n = (node_t*) malloc (sizeof(node_t));
     n->val = v;
     n->next = NULL;
@@ -45,6 +47,7 @@ void addNode(dlist_t* l, int v){
 		l->start = n;
 	}
     l->length = l->length +1;
+    return n;
 }
 
 node_t* nodeAt(dlist_t* l, int i){

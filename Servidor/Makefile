@@ -8,4 +8,4 @@ clean:
 	\rm -rf server test
 
 server: main.cpp helpers.h
-	g++ main.cpp -o server -pthread
+	g++ --std=c++11 main.cpp -o server -pthread

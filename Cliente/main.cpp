@@ -30,12 +30,12 @@ int main(int argc, char* argv[]){
     inet_aton(argv[1], &sock.sin_addr);
     
     int state = connect(client_id, (struct sockaddr *) &sock, sizeof(sock));
-
+    int readN;
     if (state == 0){
         cout << "Connected to " << inet_ntoa(sock.sin_addr) << ":" << ntohs(sock.sin_port) << endl;
 
-        while(read(fileno(stdin), buffer, sizeof(buffer))){
-            cout << buffer << endl;
+        while(readN = read(fileno(stdin), buffer, sizeof(buffer))){
+            write(client_id, &buffer, readN);
         }
     }
     else{

@@ -35,7 +35,12 @@ using namespace std;
 sem_t connections;
 server_t* se;
 
+user_t *users[MAX_CLI];
+
 void* manageConnections(dlist_t*);
+void createUser(node_t*, int);
+void* receiver(void*);
+void* sender(void*);
 
 int main(int argc, char* argv[]){
 
@@ -45,6 +50,9 @@ int main(int argc, char* argv[]){
     }
     pthread_t conn_mgr;
     sem_init(&connections, 0, MAX_CLI);
+    for(int i = 0; i < MAX_CLI; ++i){
+      users[i] = NULL;
+    }
 
     //cout << "Main Process PID: " << ::getpid() << endl;
 
@@ -62,15 +70,39 @@ int main(int argc, char* argv[]){
 }
 
 void* manageConnections(dlist_t* clients){
+  int cont = 1;
   debugM("manageConnections");
     int client;
     while(se->active){
       sem_wait(&connections);
       client = accept(se->sock, (struct sockaddr *) &(se->cli_addr), &(se->size_socket));
-      addNode(clients, client);
+      createUser(addNode(clients, client),cont);
+      cont++;
       cout << "New connection from: " << inet_ntoa(se->cli_addr.sin_addr) << endl;
     }
     pthread_exit(0);
+}
+
+void createUser(node_t* no, int num){
+  string tempname = "guest"+num;
+  user_t* u = User(tempname, no, BUFF_SIZE);
+  int it = addUser(se, u);
+  if(it < 0 || pthread_create(&(se->threadsI[it]),0,(void*(*)(void*))receiver, (void*)u)){
+    errorM("Couldn't create input thread (user: "+tempname+").");
+  }
+
+}
+
+void* receiver(void* u){
+  user_t* user = (user_t*)u;
+  int readN;
+  while(readN = read(user->node->val, user->bufferI, BUFF_SIZE)){
+    cout << (user->bufferI) << endl;
+  }
+}
+
+void* sender(void* u){
+  user_t* user = (user_t*)u;
 }
 
 void destroyConnection(dlist_t* l, int val){
