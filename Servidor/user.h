@@ -7,16 +7,18 @@
 
 struct user{
   std::string name;
-  node_t* node;
+  int fd;
+  int id;
   char* bufferI;
   char* bufferO;
 };
 typedef struct user user_t;
 
-user_t* User(std::string n, node_t* node, int buff_size){
+user_t* User(std::string n, int fd, int buff_size, int id){
   user_t* user = (user_t*)malloc(sizeof(user_t));
   user->name = n;
-  user->node = node;
+  user->id = id;
+  user->fd = fd;
   user->bufferI = (char*) malloc(buff_size);
   user->bufferO = (char*) malloc(buff_size);
   return user;

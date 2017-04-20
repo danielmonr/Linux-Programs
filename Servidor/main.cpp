@@ -24,6 +24,8 @@
 #include <semaphore.h>
 #include "helpers.h"
 #include "server.h"
+#include "./Protocols/messages.h"
+#include "chatMessages.h"
 
 #define BUFF_SIZE 250
 
@@ -32,13 +34,11 @@
 
 using namespace std;
 
-sem_t connections;
+
 server_t* se;
 
-user_t *users[MAX_CLI];
-
-void* manageConnections(dlist_t*);
-void createUser(node_t*, int);
+void* manageConnections();
+void createUser(int, int);
 void* receiver(void*);
 void* sender(void*);
 
@@ -49,18 +49,14 @@ int main(int argc, char* argv[]){
         return 0;
     }
     pthread_t conn_mgr;
-    sem_init(&connections, 0, MAX_CLI);
-    for(int i = 0; i < MAX_CLI; ++i){
-      users[i] = NULL;
-    }
 
     //cout << "Main Process PID: " << ::getpid() << endl;
 
     // Server Block
     se = Server(TCP_PORT, argv[1], BUFF_SIZE); // Create server
 	  StartServer(se, MAX_CLI); // Inicilize server
-    dlist_t* clients = DList(); // Double linked List for clients ids
-    if(pthread_create(&conn_mgr, 0, (void*(*)(void*))manageConnections, (void*)clients)){ // Accept connections through another thread
+    //dlist_t* clients = DList(); // Double linked List for clients ids
+    if(pthread_create(&conn_mgr, 0, (void*(*)(void*))manageConnections, NULL)){ // Accept connections through another thread
       errorM("Not possible to create thread.");
       return -1;
     }
@@ -69,44 +65,50 @@ int main(int argc, char* argv[]){
     // End of ser	printf("El filosofo %d se levanta de la mesa.\n", info);
 }
 
-void* manageConnections(dlist_t* clients){
+void* manageConnections(){
   int cont = 1;
   debugM("manageConnections");
     int client;
     while(se->active){
-      sem_wait(&connections);
+      sem_wait(&(se->connections));
       client = accept(se->sock, (struct sockaddr *) &(se->cli_addr), &(se->size_socket));
-      createUser(addNode(clients, client),cont);
+      createUser(client,cont);
       cont++;
       cout << "New connection from: " << inet_ntoa(se->cli_addr.sin_addr) << endl;
     }
     pthread_exit(0);
 }
 
-void createUser(node_t* no, int num){
+void createUser(int fd, int num){
   string tempname = "guest"+num;
-  user_t* u = User(tempname, no, BUFF_SIZE);
+  user_t* u = User(tempname, fd, BUFF_SIZE, num);
   int it = addUser(se, u);
   if(it < 0 || pthread_create(&(se->threadsI[it]),0,(void*(*)(void*))receiver, (void*)u)){
     errorM("Couldn't create input thread (user: "+tempname+").");
   }
+}
 
+message_t* evalInput(char* in){
+  string input(in);
+  if(in[0] == '@'){
+    debugM("Private Message");
+    int re = searchUser(se, input.substr(1, input.find_first_of(' ')-1));
+    debugM("Receiver: " + to_string(re));
+  }
 }
 
 void* receiver(void* u){
   user_t* user = (user_t*)u;
+  message_t* m;
   int readN;
-  while(readN = read(user->node->val, user->bufferI, BUFF_SIZE)){
+  while(u && (readN = read(user->fd, user->bufferI, BUFF_SIZE))){
     cout << (user->bufferI) << endl;
+    m = Message(user->bufferI);
+    receivedMessage(se, m, user);
   }
+
 }
 
 void* sender(void* u){
   user_t* user = (user_t*)u;
-}
-
-void destroyConnection(dlist_t* l, int val){
-  debugM("destroying connection");
-  deleteAt(l,search(l,val));
-  sem_post(&connections);
 }

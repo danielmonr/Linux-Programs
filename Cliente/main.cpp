@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
+#include <cstring>
 
 #define TCP_PORT 8000
 #define BUFF_SIZE 250
@@ -33,9 +34,10 @@ int main(int argc, char* argv[]){
     int readN;
     if (state == 0){
         cout << "Connected to " << inet_ntoa(sock.sin_addr) << ":" << ntohs(sock.sin_port) << endl;
-
-        while(readN = read(fileno(stdin), buffer, sizeof(buffer))){
-            write(client_id, &buffer, readN);
+        string m;
+        while(cin.getline(buffer, BUFF_SIZE)){
+            cout << "Tam: " << strlen(buffer) << endl;
+            write(client_id, &buffer, strlen(buffer));
         }
     }
     else{
