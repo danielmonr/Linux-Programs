@@ -115,3 +115,16 @@ int searchUser(server_t* s, std::string n){
     errorM("User not found");
     return -1;
 }
+
+int searchUser(server_t* s, int uid){
+    for(int i = 0; i < s->maxusers; ++i){
+        if((s->users[i] != NULL) && (s->users[i]->name == n))
+            return i;
+    }
+    errorM("User not found");
+    return -1;
+}
+
+void changeUserName(server_t* s, user_t* u, std::string newname){
+    u->name = newname;
+}
